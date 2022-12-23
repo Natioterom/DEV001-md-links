@@ -1,12 +1,43 @@
 {
-  "name": "md-links",
-  "version": "0.1.0",
-  "engines": {
-    "node": ">=16.x"
-  },
-  "bootcamp": {
-    "createdAt": "2022-11-16T21:49:06.371Z",
-    "version": "5.4.0",
-    "commit": "14aeca030be012fc987dcb1c604bbbcb0fdd325e"
-  }
+     "engines": {
+          "node": ">=16.x"
+     },
+     "bootcamp": {
+          "createdAt": "2022-11-16T21:49:06.371Z",
+          "version": "5.4.0",
+          "commit": "14aeca030be012fc987dcb1c604bbbcb0fdd325e"
+     },
+     "name": "md-links",
+     "version": "1.0.0",
+     "description": "",
+     "main": "index.js",
+     "directories": {
+          "test": "test"
+     },
+     "scripts": {
+          "test": "jest --coverage"
+     },
+     "repository": {
+          "type": "git",
+          "url": "git+https://github.com/Natioterom/DEV001-md-links.git"
+     },
+     "keywords": [
+          "markdown"
+     ],
+     "author": "Natalia Otero",
+     "license": "ISC",
+     "bugs": {
+          "url": "https://github.com/Natioterom/DEV001-md-links/issues"
+     },
+     "homepage": "https://github.com/Natioterom/DEV001-md-links#readme",
+     "devDependencies": {
+          "eslint": "^8.30.0",
+          "eslint-config-airbnb-base": "^15.0.0",
+          "eslint-plugin-import": "^2.26.0"
+     },
+     "dependencies": {
+          "chalk": "^4.1.2",
+          "figlet": "^1.5.2",
+          "marked": "^4.2.4"
+     }
 }
