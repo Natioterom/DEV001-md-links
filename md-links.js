@@ -2,12 +2,23 @@ const chalk= require('chalk');
 const fs = require('fs');
 const path = require('path')
 //Comprobar que sea un directorio
-const isDirectory =(pathFile) =>fs.statSync(pathFile).isDirectory();
+const statDirectory =(pathFile) =>fs.statSync(pathFile).isDirectory();
 //Comprobar que la ruta sea absoluta
 const paths = (pathFile) =>path.isAbsolute(pathFile);
 //Pasar la ruta a absoluta si es relativa
 const absolute = (pathFile) => path.resolve(pathFile);
 
+// Leer archivo  
+const readMd = (pathFile) => {
+  return new Promise((resolve , reject)=> {
+  fs.readFile(pathFile,(error, data)=>{
+    if(error){
+       reject (console.log(error.code))
+    } resolve(data) 
+    })    
+  })
+
+};
 
 // Leer Links
 const getLinks = (pathFile) => {
@@ -30,19 +41,9 @@ const getLinks = (pathFile) => {
           reject(error)
         })
         })
-      }
+      };
 
-// Leer archivo  
-const readMd = (pathFile) => {
-    return new Promise((resolve , reject)=> {
-    fs.readFile(pathFile,(error, data)=>{
-      if(error){
-         reject (console.log(error.code))
-      } resolve(data) 
-      })    
-    })
-  };
-  //Leer archivos md
+      //Leer archivos md
   const readFile = (pathFile) => {     
     const filePath = path.extname(pathFile) === '.md';
       if (filePath ) {
@@ -55,11 +56,11 @@ const readMd = (pathFile) => {
      }
   };
     
- // ---------------------------------------Leer Directorios-------------------------------//
+ // Leer Directorios
  const readDir = (pathFile) =>{ 
 // eslint-disable-next-line no-undef
-        // Leo directorios
-        const directorio = fs.readdirSync(pathFile);   
+        // Leo directorios []
+        const directorio = fs.readdirSync(pathFile);
         // Filtro los archivos que son Marck Down
          const arrayMd =directorio.filter(e => path.extname(e) === '.md');      
         // Completo la ruta de los archivos md filtrados, para poder leerlos
@@ -77,15 +78,13 @@ const readMd = (pathFile) => {
                 
             });
     
-  };
-  
-
-
-module.exports = {
-    isDirectory,
+};
+  module.exports = {
+  statDirectory,
     paths,
     absolute,
     readDir,
     readFile,
-    getLinks,    
+    getLinks,
+    readMd,   
 };
