@@ -1,4 +1,3 @@
-const chalk= require('chalk');
 const fs = require('fs');
 const path = require('path')
 //Comprobar que sea un directorio
@@ -7,17 +6,18 @@ const statDirectory =(pathFile) =>fs.statSync(pathFile).isDirectory();
 const paths = (pathFile) =>path.isAbsolute(pathFile);
 //Pasar la ruta a absoluta si es relativa
 const absolute = (pathFile) => path.resolve(pathFile);
+// Filtrar archivos Md
+const fileMd = (pathFile) => path.extname(pathFile);
 
-// Leer archivo  
+// Leer archivo
 const readMd = (pathFile) => {
   return new Promise((resolve , reject)=> {
   fs.readFile(pathFile,(error, data)=>{
     if(error){
-       reject (console.log(error.code))
-    } resolve(data) 
-    })    
-  })
-
+       reject(error)
+    } resolve(data)
+    });
+  });
 };
 
 // Leer Links
@@ -43,48 +43,23 @@ const getLinks = (pathFile) => {
         })
       };
 
-      //Leer archivos md
-  const readFile = (pathFile) => {     
-    const filePath = path.extname(pathFile) === '.md';
-      if (filePath ) {
-        getLinks(pathFile)
-        .then((data)=>{
-          console.log(chalk.rgb(255, 102, 153)(`Links:`),data)
-        })      
-      }else {
-       console.log(chalk.red('No es un archivo md'))
-     }
-  };
-    
+     
  // Leer Directorios
- const readDir = (pathFile) =>{ 
+ const readDir = (pathFile) =>{
 // eslint-disable-next-line no-undef
         // Leo directorios []
         const directorio = fs.readdirSync(pathFile);
         // Filtro los archivos que son Marck Down
-         const arrayMd =directorio.filter(e => path.extname(e) === '.md');      
-        // Completo la ruta de los archivos md filtrados, para poder leerlos
-        arrayMd.forEach(file => {
-        const rutaAbsoluta = path.resolve(pathFile)
-         const archivo = path.join(`${rutaAbsoluta}/${file}`);               
-        // Leo los arvhivos md y los muestro por consola.  
-           getLinks(archivo)
-             .then((data)=>{
-              if(data.length != 0){
-               console.log(chalk.rgb(204, 153, 255)(`Archivo:'${file}'`))
-               console.log(chalk.rgb(255, 102, 153)(`Links:`),data)                  
-        }
-      })    
-                
-            });
-    
-};
+         const arrayMd =directorio.filter(e => fileMd(e) === '.md');   
+           return arrayMd
+ };
+          
   module.exports = {
   statDirectory,
+  fileMd,
     paths,
     absolute,
     readDir,
-    readFile,
     getLinks,
-    readMd,   
+    readMd,
 };

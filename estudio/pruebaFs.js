@@ -10,7 +10,7 @@ fs.readFile('C:/Users/Memé/Desktop/archivoPrueba.txt', 'utf-8', (error, data) =
   console.log('esto se ejecuta antes que esté el archivo');
   
   //Bloque de leida de archivos sincrono
-  let archivo = fs.readFileSync('texto.js', 'utf-8');
+  let archivo = fs.readFileSync('README.md', 'utf-8');
   console.log(archivo);
   
   
