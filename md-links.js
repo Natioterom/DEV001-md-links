@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path')
+
 //Comprobar que sea un directorio
 const statDirectory =(pathFile) =>fs.statSync(pathFile).isDirectory();
 //Comprobar que la ruta sea absoluta
@@ -42,7 +43,6 @@ const getLinks = (pathFile) => {
         })
         })
       };
-
      
  // Leer Directorios
  const readDir = (pathFile) =>{
@@ -53,13 +53,70 @@ const getLinks = (pathFile) => {
          const arrayMd =directorio.filter(e => fileMd(e) === '.md');   
            return arrayMd
  };
-          
+ const filePath = (pathFile) => { 
+ const file =paths(pathFile) === false ? absolute(pathFile) : paths(pathFile)
+ if(statDirectory(file)){
+     const arrayMd = readDir(file);
+     const route = arrayMd.map(fileMd => {
+     const absoluta = absolute(file);
+     const archivo = path.join(`${absoluta}/${fileMd}`)
+     return archivo
+     })
+      return route   
+ }else {
+  return [pathFile]
+ }  
+};
+
+//FUNCION PARA VALIDAR LNK CON PETICIONES HTTP
+const validateLinks = (urls) => {
+  return Promise.all(urls.map((arrayLinks) => {
+    return fetch(arrayLinks.href)
+      .then((resolve) => {
+        const objResolve = {
+          ...arrayLinks,
+          status: resolve.status,
+          ok: (resolve.status >= 200) && (resolve.status <= 399) ? "ok" : "fail"
+        }
+        return objResolve;
+      })
+      .catch(() => {
+        return {
+          ...arrayLinks,
+          status: "archivo roto",
+          ok: "fail"
+        }
+      })
+  })
+  )
+};
+
+const mdLinks = (pathFile ,options) =>  new Promise ((resolve, reject )=> {
+if( options.validate === true){
+    const rutas = filePath(pathFile);
+    const links = Promise.all(rutas.map((file) => getLinks(file)))
+   const validate = links.then((data) => validateLinks(data.flat()));
+      resolve(validate);
+
+  }if(options.validate === false){
+    const rutas = filePath(pathFile);
+    const links = Promise.all(rutas.map((file => getLinks(file))))
+   resolve(links)
+   
+     }else {
+      reject( new Error ('El archivo no existe'))
+    }
+  });
+ 
+  
   module.exports = {
-  statDirectory,
-  fileMd,
+    statDirectory,
     paths,
     absolute,
-    readDir,
-    getLinks,
+    fileMd,
     readMd,
+    getLinks,
+    readDir,
+    filePath,
+    mdLinks
 };
