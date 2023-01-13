@@ -51,7 +51,8 @@ ${chalk.rgb(168, 187, 77, 1).bold('Unique:' + res[1])}`
         );
       return }
   else{
-        let links = res.map(e => `${chalk.rgb(0, 128, 128)('File:' + e.file)}
+    const prueba = res.filter(e => e.length > 0).flat()
+        let links = prueba.map(e => `${chalk.rgb(0, 128, 128)('File:' + e.file)}
         ${chalk.rgb(168, 187, 77, 1)('Href:' + e.href)}
         ${chalk.rgb(255, 182, 193, 1)('Text:'  + e.text.substr(0, 40))}`
         );
