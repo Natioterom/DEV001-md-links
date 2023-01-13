@@ -107,76 +107,61 @@ const status = (links)=> {
     const broken = new Set(status).size
     return  [ total , unique, broken]
 } 
-const mdLinks = (pathFile ,options) => { return new Promise ((resolve , reject)=> {
-  const rutas = filePath(pathFile);
-  const promise = () => {return Promise.all(rutas.map(e => getLinks(e).then((data)=> {return validateLinks(data)})))};
- if(options.validate === true && options.stats === true){
-  promise().then((res)=>{
-    resolve(status(res))
-   })
-    
-  return } 
- if(options.validate === true){
-  promise().then((res)=>resolve(res))
-   return}
-if(options.stats === true){
-  promise().then((res)=>{
-      resolve(status(res))
-     })
-        
- return  }
-else if (options.validate === false && options.stats === false){
-  rutas.forEach((file) =>
-   resolve(getLinks(file))
-   );        
-return }
- else {reject( new Error('Archivo no encontrado'))}
-}) 
-
-  }
-
-// const mdLinks = (pathFile ,options) => { return new Promise ((resolve)=> {
+// const mdLinks = (pathFile ,options) => { return new Promise ((resolve , reject)=> {
 //   const rutas = filePath(pathFile);
-//   console.log(options)
-// switch (options) {
-//   case options.validate && options.stats:
-//     console.log('uno')
-//     rutas.forEach((file) => getLinks(file)
-//     .then((data) => {
-//        validateLinks(data)
-//        .then((res)=>{
-//         resolve(status(res))
-//        })
-//      })
-//   );              
-//  break;
-// case 'validate' :
-//   rutas.forEach((file) => getLinks(file)
-//      .then((data) => {
-//         resolve(validateLinks(data))
-//       })
-//   );        
-//  break;
-// case options.stats:
-//   rutas.forEach((file) => getLinks(file)
-//   .then((data) => {
-//      validateLinks(data)
-//      .then((res)=>{
+//   const promise = () => {return Promise.all(rutas.map(e => getLinks(e).then((data)=> {return validateLinks(data)})))};
+//  if(options.validate === true && options.stats === true){
+//   promise().then((res)=>{
+//     resolve(status(res))
+//    })
+    
+//   return } 
+//  if(options.validate === true){
+//   promise().then((res)=>resolve(res))
+//    return}
+// if(options.stats === true){
+//   promise().then((res)=>{
 //       resolve(status(res))
 //      })
-//    })
-// );        
-//  break;
-//  case options.validate === false:
+        
+//  return  }
+// else if (options.validate === false && options.stats === false){
 //   rutas.forEach((file) =>
 //    resolve(getLinks(file))
 //    );        
-//  break;
-//  default:
-//   (console.log('Error')) 
+// return }
+//  else {reject( new Error('Archivo no encontrado'))}
+// }) 
+
 //   }
-// }
-// )}
+
+const mdLinks = (pathFile ,options) => { return new Promise ((resolve)=> {
+  const rutas = filePath(pathFile);
+  const promise = () => {return Promise.all(rutas.map(e => getLinks(e).then((data)=> {return validateLinks(data)})))};
+switch (true) {
+  case options.validate && options.stats:
+    promise().then((res)=>{
+    resolve(status(res))
+   })             
+ break;
+case options.validate :
+   promise().then((res)=>resolve(res))    
+ break;
+case options.stats:
+  promise().then((res)=>{
+       resolve(status(res))
+  })      
+ break;
+ case options.validate === false:
+  rutas.forEach((file) =>
+   resolve(getLinks(file))
+   );        
+ break;
+ default:
+  (console.log('Error')) 
+  }
+}
+)}
 
 
   module.exports = {
