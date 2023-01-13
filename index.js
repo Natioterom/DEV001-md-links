@@ -31,14 +31,19 @@ if (options.validate) {
         if (res.length === 0) {
          console.log(chalk.red("No se encontraron links"));
         }
-        let validateLinks = res.map(e => `${chalk.rgb(0, 128, 128)('File:' + e.file)}
+        
+          if(res.length !== 0){
+        const prueba = res.filter(e => e.length > 0).flat()
+        
+        let validateLinks = prueba.map(e => `${chalk.rgb(0, 128, 128)('File:' + e.file)}
         ${chalk.rgb(168, 187, 77, 1)('Href:' + e.href)}
-        ${chalk.rgb(255, 182, 193, 1)('Text:'  + e.text.substr(0, 40))}
+        ${chalk.rgb(255, 182, 193, 1)('Text:'  + e.text)}
         ${chalk.rgb(248, 110, 135, 1)('Status:' + e.status)}
         ${chalk.rgb(255, 102, 153)('ok:' + e.ok)}`
         );
   
         console.log(validateLinks.join('\n'));
+          }
      return }if (options.stats) {
         console.log(
         `${chalk.rgb(0, 128, 128).bold('Total:' + res[0])}

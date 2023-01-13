@@ -1,4 +1,5 @@
 const fs = require('fs');
+const { get } = require('https');
 const { resolve } = require('path');
 const path = require('path')
 
@@ -96,14 +97,8 @@ const validateLinks = (links) => {
  };
 //  const pathFile = process.argv[2];
 //  const file = filePath(pathFile)
-//  file.forEach(e => {getLinks(e)
-//  .then((x)=>{
-//    validateLinks(x)
-//    .then((jeje)=>{
-//     console.log(jeje)
-//    })
-//  })})
-
+//  const prueba = () => {return Promise.all(file.map(e => getLinks(e).then((data)=> {return validateLinks(data)})))}
+// prueba().then((res)=>{console.log(res)})
 const status = (links)=> { 
     const total = links.length;
     const url = links.map((e)=>e.href)
@@ -114,34 +109,21 @@ const status = (links)=> {
 } 
 const mdLinks = (pathFile ,options) => { return new Promise ((resolve , reject)=> {
   const rutas = filePath(pathFile);
+  const promise = () => {return Promise.all(rutas.map(e => getLinks(e).then((data)=> {return validateLinks(data)})))};
  if(options.validate === true && options.stats === true){
-    rutas.forEach((file) => getLinks(file)
-    .then((data) => {
-       validateLinks(data)
-       .then((res)=>{
-        resolve(status(res))
-       })
-     })
-  )
+  promise().then((res)=>{
+    resolve(status(res))
+   })
     
   return } 
  if(options.validate === true){
-  const file = filePath(pathFile)
- file.map(e => {getLinks(e)
- .then((x)=>{
- validateLinks(x)
-   })
-   })   
+  promise().then((res)=>resolve(res))
    return}
 if(options.stats === true){
-  rutas.forEach((file) => getLinks(file)
-  .then((data) => {
-     validateLinks(data)
-     .then((res)=>{
+  promise().then((res)=>{
       resolve(status(res))
      })
-   })
-);        
+        
  return  }
 else if (options.validate === false && options.stats === false){
   rutas.forEach((file) =>
