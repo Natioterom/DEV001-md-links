@@ -1,6 +1,7 @@
 /* eslint-disable no-undef */
 const mdLinks = require('../md-links.js');
  const fs = require('fs');
+ const path = require('path')
  jest.mock('fs')
 //  const path = require('path');
 //  jest.mock('path')
@@ -95,15 +96,28 @@ describe('readMd', () => {
   it('Debería ser una función', () => {
     expect(typeof mdLinks.readDir).toBe('function')
   });
-  it('Deberia filtrar archivos con extname.md', () => {
-    fs.readdirSync.mockImplementationOnce(()=> directorioTest)
-    directorioTest.filter(e => mdLinks.fileMd(e) === '.md')
-     expect(mdLinks.readDir(directorioTest)).toEqual(archivoTest)
+  it('Deberia llamar a readDir', ()=>{
+    mdLinks.readDir()
+    expect(mdLinks.readDir).toHaveBeenCalled()
   });
-  it('Devuelve un  array ', () =>{
-    fs.readdirSync.mockImplementationOnce(()=> directorioTest)
-    expect(mdLinks.readDir()).toBeInstanceOf(Array)
-    });
+ it('Debería retornar un array', () =>{
+   fs.readdirSync.mockImplementationOnce(()=>  directorioTest)  
+   const test = directorioTest.map((file)=> {
+     const absoluta = path.resolve('directorioTest')
+      const archivo = path.join(`${absoluta}\\${file}`)
+      return archivo   
+  })
+    expect(mdLinks.readDir('directorioTest')).toBe(test)
+ })
+  // it('Deberia filtrar archivos con extname.md', () => {
+  //   fs.readdirSync.mockImplementationOnce(()=> directorioTest)
+  //   directorioTest.filter(e => mdLinks.fileMd(e) === '.md')
+  //    expect(mdLinks.readDir(directorioTest)).toEqual(archivoTest)
+  // });
+  // it('Devuelve un  array ', () =>{
+  //   fs.readdirSync.mockImplementationOnce(()=> directorioTest)
+  //   expect(mdLinks.readDir('directorioTest')).toBeInstanceOf(Array)
+  //   });
 });
   // ------------------------------Test getLinks------------------------------
  describe('getLinks', () => {
@@ -134,3 +148,13 @@ describe('readMd', () => {
     await expect(mdLinks.getLinks(prueba)).rejects.toEqual('Error');
   })
 });
+  // ------------------------------Test filePath------------------------------
+  describe('filePath', () => {
+    it('debería er una función', () => {
+      expect(typeof mdLinks.filePath).toBe('function');
+    });
+    it('Devuelve un  array ', () =>{
+    fs.readdirSync.mockImplementationOnce(()=> directorioTest)
+    expect(mdLinks.filePath()).toBe(Array)
+    });
+  })

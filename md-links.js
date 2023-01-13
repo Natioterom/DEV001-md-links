@@ -21,6 +21,28 @@ const readMd = (pathFile) => {
     });
   });
 };
+// Leer Directorios
+const readDir = (pathFile) =>{
+  // eslint-disable-next-line no-undef
+          // Leo directorios []
+          let files =[];
+          let directorio = fs.readdirSync(pathFile);    
+          let route = directorio.map(fileMd => {
+            const absoluta = absolute(pathFile);
+            const archivo = path.join(`${absoluta}/${fileMd}`)
+            return archivo
+            })
+            route.forEach(e => {
+              if(statDirectory(e)){
+                files.push(readDir(e))
+              }else{ 
+                files.push(e)}
+            })        
+          // Filtro los archivos que son Marck Down
+           const arrayMd =files.flat().filter(e => fileMd(e) === '.md'); 
+             return arrayMd
+   };
+  
 const filePath = (pathFile) => { 
   const file =paths(pathFile) === false ? absolute(pathFile) : paths(pathFile)
   if(statDirectory(file)){
@@ -67,30 +89,7 @@ const getLinks = (pathFile) => {
       };
     
      
- // Leer Directorios
- const readDir = (pathFile) =>{
-// eslint-disable-next-line no-undef
-        // Leo directorios []
-        let files =[];
-        let directorio = fs.readdirSync(pathFile);    
-        let route = directorio.map(fileMd => {
-          const absoluta = absolute(pathFile);
-          const archivo = path.join(`${absoluta}/${fileMd}`)
-          return archivo
-          })
-          route.forEach(e => {
-            if(statDirectory(e)){
-              files.push(readDir(e))
-            }else{ 
-              files.push(e)}
-          })        
-        // Filtro los archivos que son Marck Down
-         const arrayMd =files.flat().filter(e => fileMd(e) === '.md'); 
-           return arrayMd
- };
-
-
-//FUNCION PARA VALIDAR LNK CON PETICIONES HTTP
+ //FUNCION PARA VALIDAR LNK CON PETICIONES HTTP
 const validateLinks = (links) => {
   return Promise.all(links.map((arrLinks) => {    
     return fetch(arrLinks.href)
