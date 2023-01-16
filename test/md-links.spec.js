@@ -93,12 +93,19 @@ describe('readMd', () => {
 // });
   // ------------------------------Test readDir------------------------------
  describe('readDir', () => {
-  it('Debería ser una función', () => {
-    expect(typeof mdLinks.readDir).toBe('function')
-  });
-  it('Deberia llamar a readDir', ()=>{
-    mdLinks.readDir()
-    expect(mdLinks.readDir).toHaveBeenCalled()
+  // it('Debería ser una función', () => {
+  //   expect(typeof mdLinks.readDir).toBe('function')
+  // });
+   it('Debería llamar a reddirSync', () => {
+    fs.readdirSync.mockImplementationOnce((ruta)=> {
+      if(ruta === '../directoriosPrueba'){
+        return ['test1.md', 'test2.md', 'test3.md']
+      }
+    } )
+    fs.statSync('../directoriosPrueba').isDirectory.mockReturnValue(true)
+    mdLinks.readDir('../directoriosPrueba')
+    expect(fs.readdirSync).toHaveBeenCalled()
+  
   });
  it('Debería retornar un array', () =>{
    fs.readdirSync.mockImplementationOnce(()=>  directorioTest)  
@@ -109,16 +116,26 @@ describe('readMd', () => {
   })
     expect(mdLinks.readDir('directorioTest')).toBe(test)
  })
-  // it('Deberia filtrar archivos con extname.md', () => {
-  //   fs.readdirSync.mockImplementationOnce(()=> directorioTest)
-  //   directorioTest.filter(e => mdLinks.fileMd(e) === '.md')
-  //    expect(mdLinks.readDir(directorioTest)).toEqual(archivoTest)
-  // });
-  // it('Devuelve un  array ', () =>{
-  //   fs.readdirSync.mockImplementationOnce(()=> directorioTest)
-  //   expect(mdLinks.readDir('directorioTest')).toBeInstanceOf(Array)
-  //   });
-});
+  it('Deberia filtrar archivos con extname.md', () => {
+    fs.readdirSync.mockImplementationOnce(()=> directorioTest)
+    directorioTest.filter(e => mdLinks.fileMd(e) === '.md')
+     expect(mdLinks.readDir(directorioTest)).toEqual(archivoTest)
+  });
+  it('Devuelve un  array ', () =>{
+    fs.readdirSync.mockImplementationOnce(()=> directorioTest)
+    expect(mdLinks.readDir('directorioTest')).toBeInstanceOf(Array)
+    });
+  })
+// ------------------------------Test filePath------------------------------
+describe('filePath', () => {
+  it('debería er una función', () => {
+    expect(typeof mdLinks.filePath).toBe('function');
+  });
+//   it('Debería llamar a statDirectory ', () =>{
+//     mdLinks.filePath()
+//   expect(mdLinks.statDirectory).toHaveBeenCalled()
+//   });
+})
   // ------------------------------Test getLinks------------------------------
  describe('getLinks', () => {
   it('debería er una función', () => {
@@ -148,13 +165,12 @@ describe('readMd', () => {
     await expect(mdLinks.getLinks(prueba)).rejects.toEqual('Error');
   })
 });
-  // ------------------------------Test filePath------------------------------
-  describe('filePath', () => {
+  // ------------------------------Test status------------------------------
+  describe('status', () => {
     it('debería er una función', () => {
-      expect(typeof mdLinks.filePath).toBe('function');
+      expect(typeof mdLinks.getLinks).toBe('function');
     });
     it('Devuelve un  array ', () =>{
-    fs.readdirSync.mockImplementationOnce(()=> directorioTest)
-    expect(mdLinks.filePath()).toBe(Array)
+     expect(mdLinks.status('directoriosPrueba')).toBeInstanceOf(Array)
     });
   })

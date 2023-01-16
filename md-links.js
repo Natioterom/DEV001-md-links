@@ -23,10 +23,12 @@ const readMd = (pathFile) => {
 };
 // Leer Directorios
 const readDir = (pathFile) =>{
+  console.log(pathFile)
   // eslint-disable-next-line no-undef
           // Leo directorios []
           let files =[];
-          let directorio = fs.readdirSync(pathFile);    
+          let directorio = fs.readdirSync(pathFile); 
+          console.log(directorio)  
           let route = directorio.map(fileMd => {
             const absoluta = absolute(pathFile);
             const archivo = path.join(`${absoluta}/${fileMd}`)
@@ -89,7 +91,7 @@ const getLinks = (pathFile) => {
       };
     
      
- //FUNCION PARA VALIDAR LNK CON PETICIONES HTTP
+ //Validar links con fetch y peticiones http
 const validateLinks = (links) => {
   return Promise.all(links.map((arrLinks) => {    
     return fetch(arrLinks.href)
@@ -160,5 +162,6 @@ case options.stats:
     getLinks,
     readDir,
     filePath,
+    status,
     mdLinks
 };
