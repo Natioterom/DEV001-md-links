@@ -16,8 +16,10 @@
      },
      "scripts": {
           "test": "jest --coverage",
+          "coverage": "serve ./coverage/lcov-report",
           "md-links": "node index.js"
      },
+      
      "repository": {
           "type": "git",
           "url": "git+https://github.com/Natioterom/DEV001-md-links.git"
@@ -42,5 +44,10 @@
           "chalk-ex": "^1.0.1",
           "figlet": "^1.5.2",
           "marked": "^4.2.4"
-     }
+     },
+     "bin": {
+          "md-links": "./index.js"
+        }
+    
+      
 }

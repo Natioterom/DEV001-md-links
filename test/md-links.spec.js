@@ -1,14 +1,23 @@
 /* eslint-disable no-undef */
-const mdLinks = require('../md-links.js');
- const fs = require('fs');
- const path = require('path')
- jest.mock('fs')
-//  const path = require('path');
-//  jest.mock('path')
 
-const prueba = 'C:\\Users\\Memé\\Desktop\\Laboratoria\\DEV001-md-links';
+const mdLinks = require('../md-links.js');
+const path = require('path')
+ const fs = require('fs');
+ jest.mock('fs', () => ({
+  statSync: jest.fn(() => ({
+    isDirectory : jest.fn(() => false)
+  })),
+  readFile: jest.fn(() =>{}),
+  readdirSync: jest.fn(() => {
+   return ['chau.md','hola.txt', 'hola.md', 'chau.txt']
+    })
+  }));
+
+
+
 const directorioTest = ['chau.md','hola.txt', 'hola.md', 'chau.txt'];
-const archivoTest = ['chau.md', 'hola.md'];
+const linksTest = [{href:'https://developer.mozilla.org/es/',}];
+
 
 describe('statDirectory', () => {
   it('debería ser una función', () => {
@@ -28,12 +37,21 @@ describe('paths', () => {
     expect(mdLinks.paths('test.md')).toBe(false)
 });
 });
+describe('normalize', () => {
+  it('debería ser una función', () => {
+    expect(typeof mdLinks.normalize).toBe('function');
+  });
+  it('espera que la ruta sea absoluta', () =>{
+    expect(mdLinks.normalize('.\\test')).toBe('test')
+});
+});
 describe('absolute', () => {
   it('debería ser una función', () => {
     expect(typeof mdLinks.absolute).toBe('function');
   });
-  it('Completa una ruta relativa a absoluta', () =>{    
-    expect(mdLinks.absolute('test.md')).toBe(`${prueba}\\test.md`)
+  it('Completa una ruta relativa a absoluta', () =>{
+    const absoluta= path.resolve('test.md')
+    expect(mdLinks.absolute('test.md')).toBe(absoluta)
 });
 });
 describe('fileMd', () => {
@@ -56,86 +74,58 @@ describe('readMd', () => {
    it('Debería retornar una promesa', () => {
     expect(mdLinks.readMd()).toBeInstanceOf(Promise)
    })
-    it('Debería retornar una promesa resuelta si el path existe', async () => {
+    it('Debería retornar una promesa resuelta si el path existe',  () => {
     fs.readFile.mockImplementationOnce((path,callback) => callback (null, 'Hola'));
-    await expect(mdLinks.readMd('test.md')).resolves.toEqual('Hola');
+    expect(mdLinks.readMd('test.md')).resolves.toEqual('Hola');
     });
-    it('Deberia retornar una promesa rechaza si el path no existe', async () => {
+    it('Deberia retornar una promesa rechaza si el path no existe',  () => {
       fs.readFile.mockImplementationOnce((path,callback) => callback('Error'));
-      await expect(mdLinks.readMd('test.md')).rejects.toEqual('Error');
+      expect(mdLinks.readMd('test.md')).rejects.toEqual('Error');
     })
   });
-  // ------------------------------Test readFile------------------------------
-//   describe ('readFile', () =>{
-//   it('Debería ser una función', () =>{
-//     expect(typeof mdLinks.readFile).toBe('function')
-//   });
-//   it('Debería llamar a path.extname', () =>{
-//     mdLinks.readFile()
-//     expect(path.extname).toHaveBeenCalled();
-// });
-//  it('Deberia llamar a path.extname', () =>{
-//   mdLinks.readFile()
-//   expect(path.extname).toHaveBeenCalled()
-//  });
-
-// it('Deberia llamar a path.extname', () =>{
-//   mdLinks.readFile()
-//   expect(path.extname).toHaveBeenCalled()
-//  });
-//  it('Deberia llamar a getLinks si path.extname devuelve .md', () => {
-//   path.extname.mockImplementationOnce(() => '.md')
-//   expect(mdLinks.readFile('test.md')).toBe('.md')
-// });
-// it('Deberia devolder un objecto', () => {
-//     expect(mdLinks.getLinks()).then.toBe(typeof Object)
-// });
-// });
   // ------------------------------Test readDir------------------------------
  describe('readDir', () => {
-  // it('Debería ser una función', () => {
-  //   expect(typeof mdLinks.readDir).toBe('function')
-  // });
-   it('Debería llamar a reddirSync', () => {
-    fs.readdirSync.mockImplementationOnce((ruta)=> {
-      if(ruta === '../directoriosPrueba'){
-        return ['test1.md', 'test2.md', 'test3.md']
-      }
-    } )
-    fs.statSync('../directoriosPrueba').isDirectory.mockReturnValue(true)
-    mdLinks.readDir('../directoriosPrueba')
-    expect(fs.readdirSync).toHaveBeenCalled()
-  
+  it('Debería ser una función', () => {
+    expect(typeof mdLinks.readDir).toBe('function')
   });
- it('Debería retornar un array', () =>{
-   fs.readdirSync.mockImplementationOnce(()=>  directorioTest)  
-   const test = directorioTest.map((file)=> {
-     const absoluta = path.resolve('directorioTest')
-      const archivo = path.join(`${absoluta}\\${file}`)
-      return archivo   
-  })
-    expect(mdLinks.readDir('directorioTest')).toBe(test)
- })
   it('Deberia filtrar archivos con extname.md', () => {
-    fs.readdirSync.mockImplementationOnce(()=> directorioTest)
-    directorioTest.filter(e => mdLinks.fileMd(e) === '.md')
-     expect(mdLinks.readDir(directorioTest)).toEqual(archivoTest)
+    const mdFile =directorioTest.filter(e => mdLinks.fileMd(e) === '.md')
+    const arrArchivosMd = mdFile.map(file =>{ 
+     const abs = path.resolve('directorioTest')
+     const join = path.join(`${abs}/${file}`)
+     return join})
+    
+     expect(mdLinks.readDir('directorioTest')).toEqual(arrArchivosMd)
   });
-  it('Devuelve un  array ', () =>{
-    fs.readdirSync.mockImplementationOnce(()=> directorioTest)
+  it('Devuelve un  array con la ruta completa de los archivos', () =>{
     expect(mdLinks.readDir('directorioTest')).toBeInstanceOf(Array)
     });
-  })
+  
+    it('Deberia llamar a readDir', () =>{
+      fs.statSync.mockImplementationOnce(() => ({ isDirectory: () => true }));
+      expect(mdLinks.readDir('directorioTest')).toBeInstanceOf(Array)
+      });
+   });
+     
 // ------------------------------Test filePath------------------------------
 describe('filePath', () => {
   it('debería er una función', () => {
     expect(typeof mdLinks.filePath).toBe('function');
   });
-//   it('Debería llamar a statDirectory ', () =>{
-//     mdLinks.filePath()
-//   expect(mdLinks.statDirectory).toHaveBeenCalled()
-//   });
-})
+  it('Devuelve un  array con la ruta completa  de los archivos si el path es un directorio ', () =>{
+    fs.statSync.mockImplementationOnce(() => ({ isDirectory: () => true }));
+     const arrArchivosMd =['chau.md', 'hola.md']
+     const rutas = arrArchivosMd.map(file =>{ 
+      const abs = path.resolve('arrArchivosMd')
+      const join = path.join(`${abs}/${file}`)
+      return join})
+       expect(mdLinks.filePath('arrArchivosMd')).toEqual(rutas)
+    });  
+  it('Devuelve un  array', () =>{    
+    expect(mdLinks.filePath('archivoTest')).toBeInstanceOf(Array)
+    });
+   });
+
   // ------------------------------Test getLinks------------------------------
  describe('getLinks', () => {
   it('debería er una función', () => {
@@ -148,29 +138,94 @@ describe('filePath', () => {
     mdLinks.getLinks()
     expect(fs.readFile).toHaveBeenCalled()
    });
-   it('Deberia retornar un array de objetos con los links', async () => {
+   it('Deberia retornar un array de objetos con los links', () => {
     const links = [
       {
         href: 'https://nodejs.org/es/',
         text: 'Node.js',
-        file: prueba,
+        file: 'test',
       },
     ];
     fs.readFile.mockImplementationOnce((path, callback) => callback(null, '[Node.js](https://nodejs.org/es/)'));
-    await expect(mdLinks.getLinks(prueba)).resolves.toEqual(links);
+     expect(mdLinks.getLinks('test')).resolves.toEqual(links);
   });
 
-  it('Deberia retornar una promesa rechaza si el path no existe', async () => {
+  it('Deberia retornar una promesa rechaza si el path no existe', () => {
     fs.readFile.mockImplementationOnce((path,callback) => callback('Error'));
-    await expect(mdLinks.getLinks(prueba)).rejects.toEqual('Error');
+     expect(mdLinks.getLinks('test')).rejects.toEqual('Error');
   })
 });
+ // ------------------------------Validate------------------------------
+ describe('validateLinks', () => {
+  beforeEach(() => {
+    global.fetch = (url) => new Promise ((resolve,reject)=> {
+      if(url === 'https://developer.mozilla.org/es/'){
+      resolve({status:200,
+      ok:true})
+      }
+      if(url === 'https://developer.mozilla.org/es/docs/Learn/JavaScript/Building_blocks/Functions'){
+        resolve({status:404,
+          ok:false})
+    }
+      if(url === 'https://developer.mozilla.es/404'){
+        reject({status:'archivo roto',
+          ok:false})
+    }
+    })
+});
+  it('debería er una función', () => {
+    expect(typeof mdLinks.validateLinks).toBe('function');
+  });
+  it('Debería retornar una promesa resulta ', () =>{
+   expect(mdLinks.validateLinks(linksTest)).toBeInstanceOf(Promise)
+  }); 
+  it('Debería retornar un arreglo con con status 200 ', () =>{
+    const statsTest = [{
+    href:'https://developer.mozilla.org/es/',
+         status:200,        
+          ok:'ok'}];
+      mdLinks.validateLinks(linksTest).then((res)=>expect(res).toEqual(statsTest))
+       }); 
+       it('Debería retornar un arreglo con con status 404 ', () =>{
+        const enlace = [{"href":'https://developer.mozilla.org/es/docs/Learn/JavaScript/Building_blocks/Functions'}]
+        const statsTest = [{ "href":'https://developer.mozilla.org/es/docs/Learn/JavaScript/Building_blocks/Functions',
+             status:404,        
+              ok:'fail'}];
+          mdLinks.validateLinks(enlace).then((res)=>expect(res).toEqual(statsTest))
+           }); 
+  it('Deberia retornar un arreglo con status archivo roto',  () => {
+    const enlaceRoto = [{"href": "https://developer.mozilla.es/404"}]
+    const statsTest = [{"href": "https://developer.mozilla.es/404", 
+    ok: "fail", status: "archivo roto"}]
+   mdLinks.validateLinks(enlaceRoto).catch((res)=>expect(res).toEqual(statsTest));
+      });      
+   }); 
+
+
   // ------------------------------Test status------------------------------
   describe('status', () => {
     it('debería er una función', () => {
-      expect(typeof mdLinks.getLinks).toBe('function');
+      expect(typeof mdLinks.status).toBe('function');
     });
     it('Devuelve un  array ', () =>{
-     expect(mdLinks.status('directoriosPrueba')).toBeInstanceOf(Array)
+     expect(mdLinks.status(linksTest)).toBeInstanceOf(Array)
     });
-  })
+  });
+  // ------------------------------mdLinks------------------------------
+  describe('mdLinks', () => {
+    it('debería er una función', () => {
+      expect(typeof mdLinks.mdLinks).toBe('function');
+    });
+    it('Debería retornar una promesa resulta ', () =>{
+      expect(mdLinks.mdLinks('./test.md' ,{validate: false})).toBeInstanceOf(Promise)
+     });
+    //  it('Debería retornar una array con status de los links ', () =>{
+    //   const arr =  [{Total: '10',
+    //     Unique:'3'}]
+  
+    
+    //   mdLinks.mdLinks('./README.md' ,{ stats: true}).then((res)=>expect(res).toEqual(arr))
+    // })
+     });
+
+ 

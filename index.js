@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const chalk= require('chalk');
 const { instructions } = require('./instructions.js');
 const mdLink = require('./md-links.js');
@@ -9,11 +11,11 @@ const options = {
     validate : false,
 }
 const pathFile = process.argv[2];
-process.argv.forEach(e =>{
-  if( e == "--stats" ){
+process.argv.forEach(argument =>{
+  if( argument === '--stats' ||  argument ==='--s'){
     options.stats = true
   }
- if(e == "--validate" ){
+ if(argument === '--validate' ||  argument === '--v' ){
    options.validate = true
  }
  })
@@ -33,13 +35,13 @@ if (options.validate) {
         }
         
           if(res.length !== 0){
-        const prueba = res.filter(e => e.length > 0).flat()
+        const prueba = res.filter(link => link.length > 0).flat()
         
-        let validateLinks = prueba.map(e => `${chalk.rgb(0, 128, 128)('File:' + e.file)}
-        ${chalk.rgb(168, 187, 77, 1)('Href:' + e.href)}
-        ${chalk.rgb(255, 182, 193, 1)('Text:'  + e.text)}
-        ${chalk.rgb(248, 110, 135, 1)('Status:' + e.status)}
-        ${chalk.rgb(255, 102, 153)('ok:' + e.ok)}`
+        let validateLinks = prueba.map(link => `${chalk.rgb(0, 128, 128)('File:' + link.file)}
+        ${chalk.rgb(168, 187, 77, 1)('href:'+ ' ' + link.href.slice(0,80))}
+        ${chalk.rgb(255, 182, 193, 1)('Text:' + ' ' + link.text)}
+        ${chalk.rgb(248, 110, 135, 1)('Status:'+ ' ' + link.status)}
+        ${chalk.rgb(255, 102, 153)('ok:' + link.ok)}`
         );
   
         console.log(validateLinks.join('\n'));
@@ -51,10 +53,10 @@ ${chalk.rgb(168, 187, 77, 1).bold('Unique:' + res[1])}`
         );
       return }
   else{
-    const prueba = res.filter(e => e.length > 0).flat()
-        let links = prueba.map(e => `${chalk.rgb(0, 128, 128)('File:' + e.file)}
-        ${chalk.rgb(168, 187, 77, 1)('Href:' + e.href)}
-        ${chalk.rgb(255, 182, 193, 1)('Text:'  + e.text.substr(0, 40))}`
+    const prueba = res.filter(link => link.length > 0).flat()
+        let links = prueba.map(link => `${chalk.rgb(0, 128, 128)('File:' + ' '  + link.file)}
+        ${chalk.rgb(168, 187, 77, 1)('href:' + ' ' + link.href.slice(0,80))}
+        ${chalk.rgb(255, 182, 193, 1)('Text:'+' ' + link.text.substr(0, 40))}`
         );
         console.log(links.join('\n'));
 

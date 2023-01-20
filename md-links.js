@@ -7,6 +7,8 @@ const statDirectory =(pathFile) =>fs.statSync(pathFile).isDirectory();
 const paths = (pathFile) =>path.isAbsolute(pathFile);
 //Pasar la ruta a absoluta si es relativa
 const absolute = (pathFile) => path.resolve(pathFile);
+//Normalizar la ruta
+const normalize = (pathFile) => path.normalize(pathFile)
 // Filtrar archivos Md
 const fileMd = (pathFile) => path.extname(pathFile);
 
@@ -23,40 +25,34 @@ const readMd = (pathFile) => {
 };
 // Leer Directorios
 const readDir = (pathFile) =>{
-  console.log(pathFile)
   // eslint-disable-next-line no-undef
           // Leo directorios []
           let files =[];
-          let directorio = fs.readdirSync(pathFile); 
-          console.log(directorio)  
-          let route = directorio.map(fileMd => {
+          let filesDirectory = fs.readdirSync(pathFile); 
+          let filesRoutes = filesDirectory.map(fileMd => {
             const absoluta = absolute(pathFile);
             const archivo = path.join(`${absoluta}/${fileMd}`)
             return archivo
             })
-            route.forEach(e => {
-              if(statDirectory(e)){
-                files.push(readDir(e))
+            filesRoutes.forEach(file => {
+              if(statDirectory(file)){
+                files.push(readDir(file))
               }else{ 
-                files.push(e)}
+                files.push(file)}
             })        
           // Filtro los archivos que son Marck Down
-           const arrayMd =files.flat().filter(e => fileMd(e) === '.md'); 
+           const arrayMd =files.flat().filter(file => fileMd(file) === '.md'); 
              return arrayMd
    };
   
 const filePath = (pathFile) => { 
-  const file =paths(pathFile) === false ? absolute(pathFile) : paths(pathFile)
+  const ruta =paths(pathFile) === false ? absolute(pathFile) : paths(pathFile)
+  const file = normalize(ruta);
   if(statDirectory(file)){
       let arrayMd = readDir(file);
       const route = arrayMd.map(fileMd => {
-     if(paths(fileMd)){      
+     if(paths(fileMd)){     
       return fileMd 
-     }else{
-      const absoluta = absolute(fileMd);
-       const archivo = path.join(`${absoluta}/${fileMd}`)
-       console.log()
-      return archivo
      }
       })
  return route
@@ -65,7 +61,7 @@ const filePath = (pathFile) => {
    return [pathFile]
   }  
  };
- 
+
 // Leer Links
 const getLinks = (pathFile) => {
   return new Promise((resolve, reject)=>{
@@ -99,7 +95,7 @@ const validateLinks = (links) => {
         const arrayStatus = {
           ...arrLinks,
           status: res.status,
-          ok: (res.ok === true) ? "ok" : "fail"
+          ok: res.ok? "ok" : "fail"
         }      
         return arrayStatus;
         
@@ -107,15 +103,18 @@ const validateLinks = (links) => {
       .catch(() => {
         return {
           ...arrLinks,
-          status: "archivo roto",
+          status:'no found',
           ok: "fail"
         }
       })
   })
   )
  }
-const status = (links)=> { 
+
+const status = (link)=> { 
+   const links = link.flat();
     const total = links.length;
+
     const url = links.map((e)=>e.href)
     const unique = new Set(url).size
     const  status = links.filter((e)=>e.ok !== 'ok')    
@@ -151,9 +150,10 @@ case options.stats:
   }
 }
 )}
-
+console.log(normalize('.\\test'))
 
   module.exports = {
+    normalize,
     statDirectory,
     paths,
     absolute,
@@ -162,6 +162,7 @@ case options.stats:
     getLinks,
     readDir,
     filePath,
+    validateLinks,
     status,
     mdLinks
 };
